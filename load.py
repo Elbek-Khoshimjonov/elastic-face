@@ -8,9 +8,7 @@ from elasticsearch import Elasticsearch as DB
 
 es = DB([{'host': "localhost", 'port': '9200'}])
 
-embs = []
-ids = []
-texts = []
+
 
 
 upl = "./uploads"
@@ -20,32 +18,26 @@ for id in tqdm(os.listdir(upl), "Generating embeddings"):
         
         folder = join(upl, id)
         for f in os.listdir(folder):
+            
             emb = run( cv2.imread(join(folder, f)) )
+            text = f
 
-            ids.append(id)
-            texts.append(f)
-            embs.append(emb)
-    else:
+            vector = {"embedding": emb, "id":id, "text": text} 
+            res = es.index(index="face_recognition", body=vector, doc_type="_doc")    
 
-        f = join(upl, id)
-        emb = run( cv2.imread(f) )
+            
 
-        ids.append(id)
-        texts.append(f)
-        embs.append(emb)
-
-embs = np.asarray(embs)
-ids = np.asarray(ids)
+    
 
 
-# Save to elasticsearch
+# # Save to elasticsearch
 
-for id, text, emb in zip(ids, texts, embs):
+# for id, text, emb in zip(ids, texts, embs):
 
-    vector = {"embedding": emb, "id":id, "text": text} 
-    res = es.index(index="face_recognition", body=vector, doc_type="_doc")    
+#     vector = {"embedding": emb, "id":id, "text": text} 
+#     res = es.index(index="face_recognition", body=vector, doc_type="_doc")    
 
-    print(res)
+#     print(res)
 
 
 
