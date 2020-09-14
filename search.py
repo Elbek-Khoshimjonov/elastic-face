@@ -7,20 +7,21 @@ import time
 
 es = DB([{'host': "localhost", 'port': '9200'}])
 
-img = cv2.imread("test.jpg")
+img = cv2.imread("uploads/86296/4f7c72db5c474911bf299a1629503be0.png.norm.png")
+# img = cv2.imread("sample_full.jpg")
 
-
+emb = run(img)
 
 # Build query
 query = {
-    "size":128,
+    "size":10,
     "query":{
         "script_score":{
             "query":{
                 "match_all": {}               
             },
             "script":{
-                "source": "cosineSimilarity(params.embedding, 'embedding')",
+                "source": "1 - 0.5 * l1norm(params.embedding, 'embedding') ",
                 "params":{
                     "embedding": emb,                
                 }

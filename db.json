@@ -1,0 +1,19 @@
+{
+  "mappings": {
+    "properties": {
+      
+      "embedding":{
+        "type": "dense_vector",
+        "dims": 2048
+      },
+      "id":{
+        "type": "keyword"
+      },
+      
+      "text":{
+        "type": "keyword"
+      }
+      
+    }
+  }
+}

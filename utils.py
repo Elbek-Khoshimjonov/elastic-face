@@ -1,3 +1,10 @@
+import tensorflow as tf
+import tensorflow.keras.backend as K
+
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.9
+K.set_session(tf.Session(config=config))
+
 import cv2
 import numpy as np
 from numpy import dot
@@ -144,13 +151,13 @@ def preprocess(img, opencv=False):
 
         return x
 
-def l2_norm(arr):
-    return arr / (0.00000001 + np.linalg.norm(arr))
+def l1_norm(arr):
+    return arr / (0.00000001 + np.sum(np.abs(arr)) )
 
 
 def run(img):
 
-    img = detect_face(img)
+    img = correct_face(img)
 
     # Run keras
     res = net.predict( preprocess(img) )
@@ -161,4 +168,4 @@ def run(img):
 
     res = res.flatten()
 
-    return l2_norm(res)
+    return l1_norm(res)
