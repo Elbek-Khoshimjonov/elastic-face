@@ -5,7 +5,8 @@
 2. [Kibana](https://www.elastic.co/guide/en/kibana/current/deb.html)
 
 ## Demo database (Kibana):
-```PUT face_recognition
+```json
+PUT face_recognition
 {
   "mappings": {
     "properties": {
@@ -24,8 +25,8 @@
       
     }
   }
-}```
-
+}
+```
 
 ## Requirements:
 
