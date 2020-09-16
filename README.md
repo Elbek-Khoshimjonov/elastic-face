@@ -1,7 +1,7 @@
 # Face - ElasticSearch
 
 ## Database (debian installs):
-1. [ElasticSearch with OpenDistro](https://opendistro.github.io/for-elasticsearch-docs/docs/install/) 
+1. [ElasticSearch with OpenDistro](https://opendistro.github.io/for-elasticsearch-docs/docs/install/) - error [fix](https://github.com/opendistro-for-elasticsearch/k-NN/issues/220)
 2. [Kibana](https://www.elastic.co/guide/en/kibana/current/deb.html)
 
 ## Demo database (Kibana):
