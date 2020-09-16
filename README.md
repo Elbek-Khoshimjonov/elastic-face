@@ -1,7 +1,7 @@
 # Face - ElasticSearch
 
 ## Database (debian installs):
-1. [ElasticSearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html) 
+1. [ElasticSearch with OpenDistro](https://opendistro.github.io/for-elasticsearch-docs/docs/install/) 
 2. [Kibana](https://www.elastic.co/guide/en/kibana/current/deb.html)
 
 ## Demo database (Kibana):
