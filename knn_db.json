@@ -1,0 +1,23 @@
+{
+  "settings": {
+    "index": {
+      "knn": true,
+      "knn.space_type": "cosinesimil"
+    }
+  },
+  "mappings": {
+    "properties": {
+      "embedding": {
+        "type": "knn_vector",
+        "dimension": 2048
+      },
+      "id":{
+        "type": "keyword"
+      },
+      "text":{
+        "type": "keyword"
+      }
+
+    }
+  }
+}

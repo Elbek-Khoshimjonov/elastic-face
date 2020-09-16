@@ -167,5 +167,5 @@ def run(img):
     # res = net.forward()
 
     res = res.flatten()
-
-    return l1_norm(res)
+    return res
+    # return l1_norm(res)

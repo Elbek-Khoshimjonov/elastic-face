@@ -12,22 +12,19 @@ img = cv2.imread("uploads/86296/4f7c72db5c474911bf299a1629503be0.png.norm.png")
 
 emb = run(img)
 
+k = 5
+
 # Build query
 query = {
-    "size":10,
-    "query":{
-        "script_score":{
-            "query":{
-                "match_all": {}               
-            },
-            "script":{
-                "source": "1 - 0.5 * l1norm(params.embedding, 'embedding') ",
-                "params":{
-                    "embedding": emb,                
-                }
-            }
-        }  
-    } 
+    "size": k,
+    "query": {
+      "knn": {
+        "embedding": {
+          "vector": emb,
+          "k": k
+        }
+      }
+    }
 }
 
 start_time = time.time()
@@ -36,10 +33,11 @@ res = es.search(index="face_recognition", body=query)
 
 print("--- %s seconds ---" % (time.time() - start_time))
 
+print(res)
 
-for row in res["hits"]["hits"]:
+#for row in res["hits"]["hits"]:
 
-    print("Possible Match: id : %s, text: %s, score: %f" % (row["_source"]["id"], row["_source"]["text"], row["_score"]) )    
+#    print("Possible Match: id : %s, text: %s, score: %f" % (row["_source"]["id"], row["_source"]["text"], row["_score"]) )    
 
 
 
