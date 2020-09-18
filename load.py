@@ -3,10 +3,16 @@ import os
 from os.path import isfile, isdir, join
 from tqdm import tqdm
 from elasticsearch import Elasticsearch as DB
+import sys
+import base64
 
 
+es = DB([{'host': "localhost", 'port': '9200'}], timeout=30)
 
-es = DB([{'host': "localhost", 'port': '9200'}])
+def exists(id):
+  query = {"query":{"bool":{"must": [{"match":{"id": id}}] }}}
+  res = es.search(index="face_recognition", body=query)
+  return res["hits"]["total"]["value"]>0
 
 
 
@@ -19,13 +25,15 @@ for id in tqdm(os.listdir(upl), "Generating embeddings"):
         folder = join(upl, id)
         for f in os.listdir(folder):
             
-            emb = run( cv2.imread(join(folder, f)) )
-            text = f
-
-            vector = {"embedding": emb, "id":id, "text": text} 
-            res = es.index(index="face_recognition", body=vector, doc_type="_doc")    
-
+            if not exists(id):
+              img = cv2.imread(join(folder, f))
+              emb = run(img)
             
+
+              vector = {"embedding": emb, "id":id, "image": str(base64.b64encode(cv2.imencode(".jpg", img)[1])) } 
+              res = es.index(index="face_recognition", body=vector, doc_type="_doc")    
+            # print("%s, %s, %d"%(id, text, exists(id, text)))
+          
 
     
 
@@ -79,4 +87,3 @@ for id in tqdm(os.listdir(upl), "Generating embeddings"):
 # plt.hist(yes_euc_dis, label="yes")
 # plt.hist(no_euc_dis, label="no")
 # plt.show()
-

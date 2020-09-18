@@ -2,7 +2,7 @@
   "settings": {
     "index": {
       "knn": true,
-      "knn.space_type": "cosinesimil"
+      "knn.space_type": "l2"
     }
   },
   "mappings": {
@@ -11,11 +11,11 @@
         "type": "knn_vector",
         "dimension": 2048
       },
-      "id":{
+      "id": {
         "type": "keyword"
       },
-      "text":{
-        "type": "keyword"
+      "image": {
+        "type": "binary"
       }
 
     }

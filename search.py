@@ -17,15 +17,19 @@ k = 5
 # Build query
 query = {
     "size": k,
+    "_source": {"excludes": ["embedding", "image"]},
     "query": {
       "knn": {
-        "embedding": {
+      "embedding": {
           "vector": emb,
           "k": k
         }
       }
     }
+    
 }
+
+
 
 start_time = time.time()
 
@@ -35,9 +39,9 @@ print("--- %s seconds ---" % (time.time() - start_time))
 
 print(res)
 
-#for row in res["hits"]["hits"]:
+# for row in res["hits"]["hits"]:
 
-#    print("Possible Match: id : %s, text: %s, score: %f" % (row["_source"]["id"], row["_source"]["text"], row["_score"]) )    
+#     print("Possible Match: id : %s, text: %s, l2: %f" % (row["_source"]["id"], row["_source"]["text"], 1/row["_score"]) )    
 
 
 
