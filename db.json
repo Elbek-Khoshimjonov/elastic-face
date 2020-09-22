@@ -4,14 +4,14 @@
       
       "embedding":{
         "type": "dense_vector",
-        "dims": 2048
+        "dims": 128
       },
       "id":{
         "type": "keyword"
       },
       
-      "text":{
-        "type": "keyword"
+      "image":{
+        "type": "binary"
       }
       
     }

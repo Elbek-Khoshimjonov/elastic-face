@@ -2,14 +2,14 @@
   "settings": {
     "index": {
       "knn": true,
-      "knn.space_type": "l2"
+      "knn.space_type": "cosinesimil"
     }
   },
   "mappings": {
     "properties": {
       "embedding": {
         "type": "knn_vector",
-        "dimension": 2048
+        "dimension": 128
       },
       "id": {
         "type": "keyword"

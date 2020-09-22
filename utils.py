@@ -12,7 +12,7 @@ from numpy.linalg import norm
 from math import ceil, pi
 from tensorflow.keras.models import load_model
 
-net = load_model("model/senet50.h5")
+net = load_model("model/facenet.h5")
 # net = cv2.dnn.readNetFromTensorflow("model/senet50.pb")
 
 detector = cv2.dnn.readNetFromCaffe("detector/deploy.prototxt", "detector/res10_300x300_ssd_iter_140000.caffemodel")
@@ -130,11 +130,11 @@ def correct_face(img):
 
 def preprocess(img, opencv=False):
     
-    img = cv2.resize(img, (224, 224))
+    img = cv2.resize(img, (160, 160))
     
     if opencv:
 
-        blob = cv2.dnn.blobFromImage(img, mean=(91.4953, 103.8827, 131.0912), swapRB=True)
+        blob = cv2.dnn.blobFromImage(img, scale=1/255, swapRB=True)
         return blob
 
 
@@ -142,12 +142,8 @@ def preprocess(img, opencv=False):
         x = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         x = x.astype("float32")
-        
+        x = x/255.0
         x = np.expand_dims(x, axis=0)
-        x[..., 0] -= 91.4953
-        x[..., 1] -= 103.8827
-        x[..., 2] -= 131.0912
-
 
         return x
 
