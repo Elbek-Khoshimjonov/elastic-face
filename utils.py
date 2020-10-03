@@ -1,9 +1,9 @@
 import tensorflow as tf
 import tensorflow.keras.backend as K
 
-config = tf.ConfigProto()
-config.gpu_options.per_process_gpu_memory_fraction = 0.9
-K.set_session(tf.Session(config=config))
+# config = tf.ConfigProto()
+# config.gpu_options.per_process_gpu_memory_fraction = 0.9
+# K.set_session(tf.Session(config=config))
 
 import cv2
 import numpy as np
@@ -19,7 +19,7 @@ detector = cv2.dnn.readNetFromCaffe("detector/deploy.prototxt", "detector/res10_
 
 landmarks = cv2.dnn.readNetFromCaffe("landmarks/landmark_deploy.prototxt", "landmarks/VanFace.caffemodel")
 
-def detect_face(img, min_conf=0.6):
+def detect_face(img, min_conf=0.6, ret_image=True):
 
     detector.setInput(cv2.dnn.blobFromImage(cv2.resize(img, (300, 300))) )
     detections = detector.forward()
@@ -33,10 +33,10 @@ def detect_face(img, min_conf=0.6):
     (startX, startY, endX, endY) = box.astype("int")
 
     if startX >=0 and startX < w and endX >= 0 and endX <= w and startY >=0 and startY < h and endY >=0 and endY <=h:
-        return img[startY:endY, startX:endX]
+        return img[startY:endY, startX:endX] if ret_image else [startX, startY, endX, endY]
     
 
-    return img
+    return img if ret_image else [0, 0, img.shape[1], img.shape[0]]
 
 def eye_locations(img):
 
@@ -74,18 +74,19 @@ def distance(a, b):
     return np.sqrt(diff[0]**2 + diff[1]**2)
 
 
-def rotate_image(image, angle):
+def rotate_image(image, location, angle):
     
-    image_center = tuple(np.array(image.shape[1::-1]) / 2)
-    rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
+    # image_center = tuple(np.array(image.shape[1::-1]) / 2)
+    rot_mat = cv2.getRotationMatrix2D(location, angle, 1.0)
     result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR)
     return result
 
 def correct_face(img):
 
-    img = detect_face(img)
+    bbox = detect_face(img, ret_image=False)
 
-    left_eye, right_eye = eye_locations(img)
+    face = np.copy(img[bbox[1]:bbox[3], bbox[0]:bbox[2]])
+    left_eye, right_eye = eye_locations(face)
 
 
     if left_eye[1] > right_eye[1]:
@@ -117,7 +118,7 @@ def correct_face(img):
         if direction == -1:
             angle = 90 - angle
         
-        img = rotate_image(img, direction * angle)
+        img = rotate_image(img, (bbox[0], bbox[1]), direction * angle)
         
         #you recover the base image and face detection disappeared. apply again.
         face = detect_face(img)

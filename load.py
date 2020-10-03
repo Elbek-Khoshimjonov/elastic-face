@@ -2,19 +2,14 @@ from utils import *
 import os
 from os.path import isfile, isdir, join
 from tqdm import tqdm
-from elasticsearch import Elasticsearch as DB
+from sklearn.metrics.pairwise import manhattan_distances, cosine_distances
 import sys
 import base64
+import matplotlib.pyplot as plt
 
 
-es = DB([{'host': "localhost", 'port': '9200'}], timeout=30)
-
-def exists(id):
-  query = {"query":{"bool":{"must": [{"match":{"id": id}}] }}}
-  res = es.search(index="face_recognition", body=query)
-  return res["hits"]["total"]["value"]>0
-
-
+ids = []
+embs = []
 
 
 upl = "./uploads"
@@ -25,15 +20,12 @@ for id in tqdm(os.listdir(upl), "Generating embeddings"):
         folder = join(upl, id)
         for f in os.listdir(folder):
             
-            if not exists(id):
-              img = cv2.imread(join(folder, f))
-              emb = run(img)
             
-
-              vector = {"embedding": emb, "id":id, "image": str(base64.b64encode(cv2.imencode(".jpg", img)[1])) } 
-              res = es.index(index="face_recognition", body=vector, doc_type="_doc")    
-            # print("%s, %s, %d"%(id, text, exists(id, text)))
-          
+            img = cv2.imread(join(folder, f))
+            emb = run(img)
+            ids.append(id)
+            embs.append(emb)
+            
 
     
 
@@ -47,43 +39,45 @@ for id in tqdm(os.listdir(upl), "Generating embeddings"):
 
 #     print(res)
 
+embs = np.asarray(embs)
+ids = np.asarray(ids)
 
 
 
-# euc_dis = euclidean_distances(embs)
-# cos_dis = cosine_distances(embs)
+euc_dis = manhattan_distances(embs)
+cos_dis = cosine_distances(embs)
 
-# # Preparing for euclidean distances
-# yes_euc_dis = []
-# no_euc_dis = []
+# Preparing for euclidean distances
+yes_euc_dis = []
+no_euc_dis = []
 
-# for i in tqdm(range(len(ids)), desc="Euclidean distance"):
+for i in tqdm(range(len(ids)), desc="Manhattan distance"):
 
-#     yes_euc_dis.extend(euc_dis[i][np.where(ids==ids[i])])
+    yes_euc_dis.extend(euc_dis[i][np.where(ids==ids[i])])
 
-#     no_euc_dis.extend(euc_dis[i][np.where(ids!=ids[i])])
-
-
+    no_euc_dis.extend(euc_dis[i][np.where(ids!=ids[i])])
 
 
 
-# # Preparing for cosine distances
-# yes_cos_dis = []
-# no_cos_dis = []
-
-# for i in tqdm(range(len(ids)), desc="Cosine distance"):
-
-#     yes_cos_dis.extend(cos_dis[i][np.where(ids==ids[i])])
-
-#     no_cos_dis.extend(cos_dis[i][np.where(ids!=ids[i])])
 
 
-# # Histogram
-# plt.subplot(211)
-# plt.hist(yes_cos_dis, label="yes")
-# plt.hist(no_cos_dis, label="no")
+# Preparing for cosine distances
+yes_cos_dis = []
+no_cos_dis = []
 
-# plt.subplot(212)
-# plt.hist(yes_euc_dis, label="yes")
-# plt.hist(no_euc_dis, label="no")
-# plt.show()
+for i in tqdm(range(len(ids)), desc="Cosine distance"):
+
+    yes_cos_dis.extend(cos_dis[i][np.where(ids==ids[i])])
+
+    no_cos_dis.extend(cos_dis[i][np.where(ids!=ids[i])])
+
+
+# Histogram
+plt.subplot(211)
+plt.hist(yes_cos_dis, label="yes")
+plt.hist(no_cos_dis, label="no")
+
+plt.subplot(212)
+plt.hist(yes_euc_dis, label="yes")
+plt.hist(no_euc_dis, label="no")
+plt.show()
